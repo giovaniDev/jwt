@@ -1,4 +1,5 @@
 const UserSchema = require('../models/User');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     async createUser(req, res) {
@@ -19,5 +20,19 @@ module.exports = {
     async findUserByID(req, res) {
         const user = await UserSchema.findById(req.params.id);
         return res.json(user);
+    },
+    async authUser(req, res) {
+        const { email, password } = req.body;
+        const user = await UserSchema.findOne({ email }).select('+password');
+        if (!user) {
+            return res.status(400).json({ error: 'Usuario nao encontrado.' });
+        }
+        if (password != user.password) {
+            return res.status(400).json({ error: 'Senhha incorreta' });
+        }
+        const token = jwt.sign({ id: user.id }, process.env.SECRET, {
+            expiresIn: 10
+        });
+        return res.send({auth: 'Autentificado com sucesso', token})
     }
 }
