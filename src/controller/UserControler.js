@@ -30,9 +30,7 @@ module.exports = {
         if (password != user.password) {
             return res.status(400).json({ error: 'Senhha incorreta' });
         }
-        const token = jwt.sign({ id: user.id }, process.env.SECRET, {
-            expiresIn: 10
-        });
+        const token = jwt.sign({ id: user.id }, process.env.SECRET);
         return res.send({auth: 'Autentificado com sucesso', token})
     }
 }
